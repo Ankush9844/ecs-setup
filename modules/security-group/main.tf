@@ -1,7 +1,7 @@
-resource "aws_security_group" "alb_sg" {
-  name        = "${var.project_name}-ALB-SG"
+resource "aws_security_group" "appLoadBalancerSecurityGroup" {
+  name        = "${var.ProjectName}-ALB-SG"
   description = "Allow HTTP"
-  vpc_id      = var.vpc_id
+  vpc_id      = var.vpcID
 
   ingress {
     from_port   = 80
@@ -25,15 +25,15 @@ resource "aws_security_group" "alb_sg" {
 }
 
 
-resource "aws_security_group" "ecs_tasks" {
-  name   = "${var.project_name}-ECS-Tasks"
-  vpc_id = var.vpc_id
+resource "aws_security_group" "ecsFargateSecurityGroup" {
+  name   = "${var.ProjectName}-ECS-Tasks"
+  vpc_id = var.vpcID
 
   ingress {
     from_port       = 3000
     to_port         = 3000
     protocol        = "tcp"
-    security_groups = [aws_security_group.alb_sg.id]
+    security_groups = [aws_security_group.appLoadBalancerSecurityGroup.id]
     description     = "Allow Traffic from Application Load Balancer"
   }
 
@@ -46,10 +46,10 @@ resource "aws_security_group" "ecs_tasks" {
 }
 
 
-resource "aws_security_group" "ecs_sg" {
-  name        = "${var.project_name}-ECS-SG"
+resource "aws_security_group" "ecsEC2SecurityGroup" {
+  name        = "${var.ProjectName}-ECS-SG"
   description = "Allow HTTP"
-  vpc_id      = var.vpc_id
+  vpc_id      = var.vpcID
 
   ingress {
     from_port   = 80
@@ -73,7 +73,7 @@ resource "aws_security_group" "ecs_sg" {
     from_port       = 3000
     to_port         = 3000
     protocol        = "tcp"
-    security_groups = [aws_security_group.alb_sg.id]
+    security_groups = [aws_security_group.appLoadBalancerSecurityGroup.id]
     description     = "Allow Traffic from Application Load Balancer"
   }
 

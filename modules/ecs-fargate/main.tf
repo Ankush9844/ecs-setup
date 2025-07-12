@@ -1,5 +1,5 @@
-resource "aws_iam_role" "ecs_task_execution_role" {
-  name = "${var.project_name}-ecsTaskExecutionRole"
+resource "aws_iam_role" "ecsTaskExecutionRole" {
+  name = "${var.ProjectName}-ecsTaskExecutionRole"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17",
@@ -15,29 +15,29 @@ resource "aws_iam_role" "ecs_task_execution_role" {
   })
 }
 
-resource "aws_iam_role_policy_attachment" "ecs_task_execution_policy" {
-  role       = aws_iam_role.ecs_task_execution_role.name
+resource "aws_iam_role_policy_attachment" "ecsTaskExecutionPolicy" {
+  role       = aws_iam_role.ecsTaskExecutionRole.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
 }
 
 
 
 resource "aws_ecs_cluster" "main" {
-  name = var.project_name
+  name = var.ProjectName
 }
 
-resource "aws_ecs_task_definition" "fargate_task" {
-  family                   = "fargate-task"
+resource "aws_ecs_task_definition" "fargateTaskDefination" {
+  family                   = "fargateTaskDefination"
   requires_compatibilities = ["FARGATE"]
   network_mode             = "awsvpc"
   cpu                      = "256"
   memory                   = "512"
-  execution_role_arn       = aws_iam_role.ecs_task_execution_role.arn
+  execution_role_arn       = aws_iam_role.ecsTaskExecutionRole.arn
 
   container_definitions = jsonencode([
     {
       name      = "chatapp"
-      image     = var.container_image
+      image     = var.ContainerImage
       essential = true
       portMappings = [
         {
@@ -49,24 +49,24 @@ resource "aws_ecs_task_definition" "fargate_task" {
   ])
 }
 
-resource "aws_ecs_service" "fargate_service" {
-  name            = "fargate-service"
+resource "aws_ecs_service" "fargateService" {
+  name            = "fargateService"
   cluster         = aws_ecs_cluster.main.id
-  task_definition = aws_ecs_task_definition.fargate_task.arn
+  task_definition = aws_ecs_task_definition.fargateTaskDefination.arn
   launch_type     = "FARGATE"
   desired_count   = 1
 
   network_configuration {
-    subnets         = concat(var.public_subnet_ids)
-    security_groups = [var.ecs_task_sg_id]
+    subnets         = concat(var.PublicSubnetIDs)
+    security_groups = [var.ecsFargateSecurityGroupID]
     assign_public_ip = true
   }
 
   load_balancer {
-    target_group_arn = var.alb_target_group_arn
+    target_group_arn = var.fargateTargetGroupARN
     container_name   = "chatapp"
     container_port   = 3000
   }
 
-  depends_on = [aws_ecs_task_definition.fargate_task]
+  depends_on = [aws_ecs_task_definition.fargateTaskDefination]
 }

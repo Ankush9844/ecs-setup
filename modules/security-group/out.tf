@@ -1,11 +1,11 @@
-output "alb_sg_id" {
-  value = aws_security_group.alb_sg.id
+output "appLoadBalancerSecurityGroupID" {
+  value = aws_security_group.appLoadBalancerSecurityGroup.id
 }
 
-output "ecs_task_sg_id" {
-  value = aws_security_group.ecs_tasks.id
+output "ecsFagateSecurityGroupID" {
+  value = aws_security_group.ecsFargateSecurityGroup.id
 }
 
-output "ecs_security_group_id" {
-  value = aws_security_group.ecs_sg.id
+output "ecsEC2SecurityGroupID" {
+  value = aws_security_group.ecsEC2SecurityGroup.id
 }
