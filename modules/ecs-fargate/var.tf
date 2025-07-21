@@ -1,5 +1,8 @@
 variable "ProjectName" {}
-variable "ContainerImage" {}
+variable "containerImage" {}
+variable "containerImageBackend" {}
 variable "PublicSubnetIDs" {}
 variable "fargateTargetGroupARN" {}
+variable "fargateTargetGroupBackendARN" {}
 variable "ecsFargateSecurityGroupID" {}
+variable "ecsFargateSecurityGroupBackendID" {}

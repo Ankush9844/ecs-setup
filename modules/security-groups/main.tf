@@ -46,6 +46,27 @@ resource "aws_security_group" "ecsFargateSecurityGroup" {
 }
 
 
+resource "aws_security_group" "ecsFargateSecurityGroupBackend" {
+  name   = "${var.ProjectName}-ECS-Tasks-Backend"
+  vpc_id = var.vpcID
+
+  ingress {
+    from_port       = 5000
+    to_port         = 5000
+    protocol        = "tcp"
+    security_groups = [aws_security_group.appLoadBalancerSecurityGroup.id]
+    description     = "Allow Traffic from Application Load Balancer"
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
+
 resource "aws_security_group" "ecsEC2SecurityGroup" {
   name        = "${var.ProjectName}-ECS-SG"
   description = "Allow HTTP"

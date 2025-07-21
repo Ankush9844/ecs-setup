@@ -73,7 +73,7 @@ resource "aws_iam_role_policy_attachment" "codebuild_ecr" {
 
 
 data "aws_codestarconnections_connection" "github" {
-  name = "my-github-connection"
+  name = "ankush-github-connection"
 }
 
 resource "aws_codebuild_project" "frontendCodeBuildProject" {
@@ -95,7 +95,7 @@ resource "aws_codebuild_project" "frontendCodeBuildProject" {
 
   source {
     type     = "GITHUB"
-    location = "https://github.com/Developer9844/auth_app.git"
+    location = "https://github.com/Ankush9844/auth_app.git"
     git_clone_depth = 1
     buildspec = "buildspec-frontend.yaml"
     auth {
@@ -127,7 +127,7 @@ resource "aws_codebuild_project" "backendCodeBuildProject" {
 
   source {
     type      = "GITHUB"
-    location  = "https://github.com/Developer9844/auth_app.git"
+    location  = "https://github.com/Ankush9844/auth_app.git"
     git_clone_depth = 1
     buildspec = "buildspec-backend.yaml"
     auth {

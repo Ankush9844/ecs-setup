@@ -6,6 +6,10 @@ output "ecsFagateSecurityGroupID" {
   value = aws_security_group.ecsFargateSecurityGroup.id
 }
 
+output "ecsFargateSecurityGroupBackendID" {
+  value = aws_security_group.ecsFargateSecurityGroupBackend.id
+}
+
 output "ecsEC2SecurityGroupID" {
   value = aws_security_group.ecsEC2SecurityGroup.id
 }

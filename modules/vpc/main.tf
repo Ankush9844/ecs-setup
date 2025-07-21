@@ -94,19 +94,19 @@ resource "aws_route_table_association" "privateSubnetRoute" {
 
 
 # create nat-gateway
-resource "aws_eip" "elasticIP" {}
+# resource "aws_eip" "elasticIP" {}
 
-resource "aws_nat_gateway" "natGateway" {
-  allocation_id = aws_eip.elasticIP.id
-  subnet_id     = aws_subnet.public[0].id
-  tags = {
-    Name = "NAT-Gateway"
-  }
-}
+# resource "aws_nat_gateway" "natGateway" {
+#   allocation_id = aws_eip.elasticIP.id
+#   subnet_id     = aws_subnet.public[0].id
+#   tags = {
+#     Name = "NAT-Gateway"
+#   }
+# }
 
-## ensure route
-resource "aws_route" "natGatewayRoute" {
-  route_table_id         = aws_route_table.privateRouteTable.id
-  nat_gateway_id         = aws_nat_gateway.natGateway.id
-  destination_cidr_block = "0.0.0.0/0"
-}
+# ## ensure route
+# resource "aws_route" "natGatewayRoute" {
+#   route_table_id         = aws_route_table.privateRouteTable.id
+#   nat_gateway_id         = aws_nat_gateway.natGateway.id
+#   destination_cidr_block = "0.0.0.0/0"
+# }
