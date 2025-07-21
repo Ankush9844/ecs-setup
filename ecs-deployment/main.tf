@@ -5,7 +5,7 @@ module "vpc" {
 }
 
 module "securityGroups" {
-  source      = "../modules/security-group"
+  source      = "../modules/security-groups"
   ProjectName = var.ProjectName
   vpcID       = module.vpc.vpcID
 }
@@ -40,3 +40,15 @@ module "ecsOnFargate" {
 #   depends_on         = [module.vpc, module.appLoadBalancer, module.securityGroups]
 # }
 
+module "codeBuildProject" {
+  source       = "../modules/pipeline/codebuild"
+  github_token = var.github_token
+  account_id   = var.account_id
+  aws_region   = var.aws_region
+}
+
+module "chatappFrontendPipeline" {
+  source     = "../modules/pipeline/codepipeline"
+  aws_region = var.aws_region
+  account_id = var.account_id
+}
