@@ -2,7 +2,8 @@ variable "aws_profile" {}
 variable "region" {}
 variable "ProjectName" {}
 variable "cidrBlock" {}
-variable "ContainerImage" {}
+variable "containerImage" {}
+variable "containerImageBackend" {}
 variable "InstanceType" {}
 variable "KeyName" {}
 variable "github_token" {}

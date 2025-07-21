@@ -19,13 +19,16 @@ module "appLoadBalancer" {
 }
 
 module "ecsOnFargate" {
-  source                    = "../modules/ecs-fargate"
-  ProjectName               = var.ProjectName
-  ecsFargateSecurityGroupID = module.securityGroups.ecsFagateSecurityGroupID
-  fargateTargetGroupARN     = module.appLoadBalancer.fargateTargetGroupARN
-  PublicSubnetIDs           = module.vpc.PublicSubnetIDs
-  ContainerImage            = var.ContainerImage
-  depends_on                = [module.vpc, module.appLoadBalancer]
+  source                           = "../modules/ecs-fargate"
+  ProjectName                      = var.ProjectName
+  ecsFargateSecurityGroupID        = module.securityGroups.ecsFagateSecurityGroupID
+  ecsFargateSecurityGroupBackendID = module.securityGroups.ecsFargateSecurityGroupBackendID
+  fargateTargetGroupARN            = module.appLoadBalancer.fargateTargetGroupARN
+  fargateTargetGroupBackendARN     = module.appLoadBalancer.fargateTargetGroupBackendARN
+  PublicSubnetIDs                  = module.vpc.PublicSubnetIDs
+  containerImage                   = var.containerImage
+  containerImageBackend            = var.containerImageBackend
+  depends_on                       = [module.vpc, module.appLoadBalancer]
 }
 
 # module "ecsOnEC2" {
