@@ -73,7 +73,7 @@ resource "aws_iam_role_policy" "codepipeline_custom" {
           "ecs:UpdateService"
         ],
         "Resource" : [
-          "arn:aws:ecs:*:600748199510:service/My-Cluster/*"
+          "arn:aws:ecs:*:600748199510:service/*"
         ]
       },
       {
@@ -83,7 +83,7 @@ resource "aws_iam_role_policy" "codepipeline_custom" {
           "ecs:TagResource"
         ],
         "Resource" : [
-          "arn:aws:ecs:*:600748199510:task-definition/arn:aws:ecs:us-east-1:600748199510:task-definition/fargateTaskDefination:6:*"
+          "arn:aws:ecs:*:600748199510:task-definition/arn:aws:ecs:us-east-1:600748199510:task-definition/*"
         ],
         "Condition" : {
           "StringEquals" : {
@@ -98,7 +98,7 @@ resource "aws_iam_role_policy" "codepipeline_custom" {
         "Effect" : "Allow",
         "Action" : "iam:PassRole",
         "Resource" : [
-          "arn:aws:iam::600748199510:role/My-Cluster-ecsTaskExecutionRole"
+          "arn:aws:iam::600748199510:role/ecsTaskExecutionRole"
         ],
         "Condition" : {
           "StringEquals" : {

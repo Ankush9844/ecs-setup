@@ -1,5 +1,9 @@
+################################################################
+# Create IAM Role for ECS TaskExecution                        #
+################################################################
+
 resource "aws_iam_role" "ecsTaskExecutionRole" {
-  name = "${var.ProjectName}-ecsTaskExecutionRole"
+  name = "ecsTaskExecutionRole"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17",
@@ -20,13 +24,19 @@ resource "aws_iam_role_policy_attachment" "ecsTaskExecutionPolicy" {
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
 }
 
-
+################################################################
+# Create ECS Cluster                                           #
+################################################################
 
 resource "aws_ecs_cluster" "main" {
   name = var.ProjectName
 }
 
-resource "aws_ecs_task_definition" "fargateTaskDefination" {
+################################################################
+# Create ECS Task Defination for Frontend                      #
+################################################################
+
+resource "aws_ecs_task_definition" "fargateTaskDefinationFrontend" {
   family                   = "fargateTaskDefination"
   requires_compatibilities = ["FARGATE"]
   network_mode             = "awsvpc"
@@ -41,7 +51,7 @@ resource "aws_ecs_task_definition" "fargateTaskDefination" {
       environment = [
         {
           name = "API_BASE_URL"
-          value = "https://backend.anshtechnolabs.shop"
+          value = "https://${var.backendDomain}"
         }
       ]
       essential = true
@@ -56,16 +66,20 @@ resource "aws_ecs_task_definition" "fargateTaskDefination" {
   ])
 }
 
-resource "aws_ecs_service" "fargateService" {
+################################################################
+# Create ECS Service for Frontend                              #
+################################################################
+
+resource "aws_ecs_service" "fargateServiceFrontend" {
   name            = "fargateService"
   cluster         = aws_ecs_cluster.main.id
-  task_definition = aws_ecs_task_definition.fargateTaskDefination.arn
+  task_definition = aws_ecs_task_definition.fargateTaskDefinationFrontend.arn
   launch_type     = "FARGATE"
   desired_count   = 1
 
   network_configuration {
     subnets         = concat(var.PublicSubnetIDs)
-    security_groups = [var.ecsFargateSecurityGroupID]
+    security_groups = [var.ecsFargateSecurityGroupFrontendID]
     assign_public_ip = true
   }
 
@@ -79,7 +93,9 @@ resource "aws_ecs_service" "fargateService" {
 }
 
 
-
+################################################################
+# Create ECS Task Defination for Backend                       #
+################################################################
 
 
 resource "aws_ecs_task_definition" "fargateTaskDefinationBackend" {
@@ -130,6 +146,11 @@ resource "aws_ecs_task_definition" "fargateTaskDefinationBackend" {
     }
   ])
 }
+
+
+################################################################
+# Create ECS Service for Backend                               #
+################################################################
 
 resource "aws_ecs_service" "fargateServiceBackend" {
   name            = "fargateServiceBackend"

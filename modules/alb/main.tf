@@ -1,3 +1,7 @@
+#################################################################
+# Create Application Load Balancer                              #
+#################################################################
+
 resource "aws_lb" "applicationLoadBalancer" {
   name               = "${var.ProjectName}-ALB"
   internal           = false
@@ -7,9 +11,12 @@ resource "aws_lb" "applicationLoadBalancer" {
 
 }
 
-###############################################################
-resource "aws_lb_target_group" "fargateTargetGroup" {
-  name            = "${var.ProjectName}-FargateTargetGroup"
+################################################################
+# Create Target Group For Frontend                             #
+################################################################
+
+resource "aws_lb_target_group" "fargateTargetGroupFrontend" {
+  name            = "FargateTargetGroupFrontend"
   target_type     = "ip" # "instance", "lambda"
   port            = 3000 # container port
   protocol        = "HTTP"
@@ -26,7 +33,11 @@ resource "aws_lb_target_group" "fargateTargetGroup" {
   }
 }
 
-resource "aws_lb_listener" "fargateListener" {
+################################################################
+# Create Http Listener For Frontend                            #
+################################################################
+
+resource "aws_lb_listener" "fargateHttpListener" {
   load_balancer_arn = aws_lb.applicationLoadBalancer.arn
   port              = 80
   protocol          = "HTTP"
@@ -42,53 +53,34 @@ resource "aws_lb_listener" "fargateListener" {
   }
 }
 
+################################################################
+# Create Https Listener For Frontend and Backend               #
+################################################################
 
-
-resource "aws_lb_listener" "httpsListener" {
+resource "aws_lb_listener" "fargateHttpsListener" {
   load_balancer_arn = aws_lb.applicationLoadBalancer.arn
   port              = 443
   protocol          = "HTTPS"
   ssl_policy        = "ELBSecurityPolicy-2016-08"
   # Default certificate
-  certificate_arn = "arn:aws:acm:us-east-1:600748199510:certificate/913013be-9dbb-423a-8292-6e1403192095"
+  certificate_arn = var.defaultSSLCertificateARN
 
 
   default_action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.fargateTargetGroup.arn
+    target_group_arn = aws_lb_target_group.fargateTargetGroupFrontend.arn
   }
   
 }
 
 resource "aws_lb_listener_certificate" "additional_cert" {
-  listener_arn    = aws_lb_listener.httpsListener.arn
-  certificate_arn = "arn:aws:acm:us-east-1:600748199510:certificate/a16e5217-071a-4244-9bde-25868fd647ee"
+  listener_arn    = aws_lb_listener.fargateHttpsListener.arn
+  certificate_arn = var.additionalSSLCertificateARN
 }
 
-resource "aws_lb_listener_rule" "frontend_rule" {
-  listener_arn = aws_lb_listener.httpsListener.arn
-  priority     = 100
-
-  action {
-    type             = "forward"
-    target_group_arn = aws_lb_target_group.fargateTargetGroup.arn
-  }
-
-  condition {
-    host_header {
-      values = ["frontend.anshtechnolabs.shop"]
-    }
-  }
-}
-
-
-
-
-
-
-###############################################################
-
-
+################################################################
+# Create Target Goup For Backend                               #
+################################################################
 
 resource "aws_lb_target_group" "fargateTargetGroupBackend" {
   name            = "FargateTargetGroupBackend"
@@ -108,9 +100,28 @@ resource "aws_lb_target_group" "fargateTargetGroupBackend" {
   }
 }
 
+################################################################
+# Create Listener Rules for Frontend and Backend               #
+################################################################
+
+resource "aws_lb_listener_rule" "frontend_rule" {
+  listener_arn = aws_lb_listener.fargateHttpsListener.arn
+  priority     = 100
+
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.fargateTargetGroupFrontend.arn
+  }
+
+  condition {
+    host_header {
+      values = [var.frontendDomain]
+    }
+  }
+}
 
 resource "aws_lb_listener_rule" "backend_rule" {
-  listener_arn = aws_lb_listener.httpsListener.arn
+  listener_arn = aws_lb_listener.fargateHttpsListener.arn
   priority     = 101
 
   action {
@@ -120,13 +131,15 @@ resource "aws_lb_listener_rule" "backend_rule" {
 
   condition {
     host_header {
-      values = ["backend.anshtechnolabs.shop"]
+      values = [var.backendDomain]
     }
   }
 }
 
 
-#####################################
+################################################################
+# Create ALB for EC2 Launch Type                               #
+################################################################
 
 # resource "aws_lb_target_group" "ec2TargetGroup" {
 #   name            = "${var.ProjectName}-EC2-Target-Group"

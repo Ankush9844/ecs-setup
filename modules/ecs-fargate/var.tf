@@ -4,5 +4,6 @@ variable "containerImageBackend" {}
 variable "PublicSubnetIDs" {}
 variable "fargateTargetGroupARN" {}
 variable "fargateTargetGroupBackendARN" {}
-variable "ecsFargateSecurityGroupID" {}
+variable "ecsFargateSecurityGroupFrontendID" {}
 variable "ecsFargateSecurityGroupBackendID" {}
+variable "backendDomain" {}

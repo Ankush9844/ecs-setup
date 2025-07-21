@@ -25,7 +25,7 @@ resource "aws_security_group" "appLoadBalancerSecurityGroup" {
 }
 
 
-resource "aws_security_group" "ecsFargateSecurityGroup" {
+resource "aws_security_group" "ecsFargateSecurityGroupFrontend" {
   name   = "${var.ProjectName}-ECS-Tasks"
   vpc_id = var.vpcID
 

@@ -16,6 +16,10 @@ module "appLoadBalancer" {
   vpcID                          = module.vpc.vpcID
   PublicSubnetIDs                = module.vpc.PublicSubnetIDs
   appLoadBalancerSecurityGroupID = module.securityGroups.appLoadBalancerSecurityGroupID
+  defaultSSLCertificateARN       = var.defaultSSLCertificateARN
+  additionalSSLCertificateARN = var.additionalSSLCertificateARN
+  frontendDomain = var.frontendDomain
+  backendDomain = var.backendDomain
 }
 
 module "ecsOnFargate" {

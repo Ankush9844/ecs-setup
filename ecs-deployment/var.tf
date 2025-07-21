@@ -9,3 +9,7 @@ variable "KeyName" {}
 variable "github_token" {}
 variable "aws_region" {}
 variable "account_id" {}
+variable "defaultSSLCertificateARN" {}
+variable "additionalSSLCertificateARN" {}
+variable "frontendDomain" {}
+variable "backendDomain" {}

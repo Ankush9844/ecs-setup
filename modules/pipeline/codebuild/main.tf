@@ -1,4 +1,8 @@
-resource "aws_iam_role" "codebuild_role" {
+################################################################
+# Create IAM ROle for Codebuild                                #
+################################################################
+
+resource "aws_iam_role" "codebuildIAMRole" {
   name = "codebuild-service-role"
 
   assume_role_policy = jsonencode({
@@ -19,7 +23,7 @@ locals {
 
 resource "aws_iam_role_policy" "allow_custom_policies" {
   name = "AllowCustomPoliciesToCodePipeline"
-  role = aws_iam_role.codebuild_role.name
+  role = aws_iam_role.codebuildIAMRole.name
 
   policy = jsonencode({
     Version = "2012-10-17",
@@ -54,33 +58,38 @@ resource "aws_iam_role_policy" "allow_custom_policies" {
 }
 
 resource "aws_iam_role_policy_attachment" "codebuild_policy" {
-  role       = aws_iam_role.codebuild_role.name
+  role       = aws_iam_role.codebuildIAMRole.name
   policy_arn = "arn:aws:iam::aws:policy/AWSCodeBuildDeveloperAccess"
 }
 
 resource "aws_iam_role_policy_attachment" "codebuild_logs" {
-  role       = aws_iam_role.codebuild_role.name
+  role       = aws_iam_role.codebuildIAMRole.name
   policy_arn = "arn:aws:iam::aws:policy/CloudWatchLogsFullAccess"
 }
 
 resource "aws_iam_role_policy_attachment" "codebuild_ecr" {
-  role       = aws_iam_role.codebuild_role.name
+  role       = aws_iam_role.codebuildIAMRole.name
   policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryPowerUser"
 }
 
 
-
-
+################################################################
+# Get Data of Github Connection                                #
+################################################################
 
 data "aws_codestarconnections_connection" "github" {
-  name = "ankush-github-connection"
+  name = var.githubConnection
 }
 
-resource "aws_codebuild_project" "frontendCodeBuildProject" {
-  name          = "frontend-build"
+################################################################
+# Create Codebuild Project for Frontend                        #
+################################################################
+
+resource "aws_codebuild_project" "codeBuildFrontendProject" {
+  name          = "Frontend-build"
   description   = "Builds project from GitHub"
   build_timeout = 5
-  service_role  = aws_iam_role.codebuild_role.arn
+  service_role  = aws_iam_role.codebuildIAMRole.arn
 
   artifacts {
     type = "NO_ARTIFACTS"
@@ -106,13 +115,15 @@ resource "aws_codebuild_project" "frontendCodeBuildProject" {
   source_version = "master"  
 }
 
+################################################################
+# Create Codebuild Project for Backend                         #
+################################################################
 
-
-resource "aws_codebuild_project" "backendCodeBuildProject" {
+resource "aws_codebuild_project" "codeBuildBackendProject" {
   name          = "backend-build"
   description   = "Builds project from GitHub"
   build_timeout = 5
-  service_role  = aws_iam_role.codebuild_role.arn
+  service_role  = aws_iam_role.codebuildIAMRole.arn
 
   artifacts {
     type = "NO_ARTIFACTS"
