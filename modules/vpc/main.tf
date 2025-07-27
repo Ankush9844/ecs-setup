@@ -1,3 +1,7 @@
+################################################################
+# Create VPC and Components                                    #
+################################################################
+
 resource "aws_vpc" "vpc" {
   cidr_block       = var.cidrBlock
   instance_tenancy = "default"
@@ -16,6 +20,11 @@ resource "aws_internet_gateway" "internetGateway" {
 
 }
 
+
+################################################################
+# Get Available Zones                                          #
+################################################################
+
 data "aws_availability_zones" "zones" {
   state = "available"
 }
@@ -23,7 +32,9 @@ output "zones" {
   value = data.aws_availability_zones.zones.names
 }
 
-# create public subnet az1
+################################################################
+# Create Public Subnets in VPC                                 #
+################################################################
 
 resource "aws_subnet" "public" {
   count                   = 2
@@ -39,8 +50,9 @@ resource "aws_subnet" "public" {
 
 
 
-# create route table and public route i.e. add internet gateway in public route table with internet access 0.0.0.0/0
-# we create public route for internet access
+################################################################
+# Create Public Route Table                                    #
+################################################################
 
 resource "aws_route_table" "publicRouteTable" {
   vpc_id = aws_vpc.vpc.id
@@ -51,7 +63,9 @@ resource "aws_route_table" "publicRouteTable" {
   }
 }
 
-# associate public subnet 1 to public route table
+################################################################
+# Associate Public Subnet Route                                #
+################################################################
 
 resource "aws_route_table_association" "publicSubnetRoute" {
   count          = length(aws_subnet.public)
@@ -61,7 +75,9 @@ resource "aws_route_table_association" "publicSubnetRoute" {
 
 
 
-# create private subnet
+################################################################
+# Create Private Subnets in VPC                                #
+################################################################
 
 resource "aws_subnet" "private" {
   count             = 2
@@ -75,8 +91,10 @@ resource "aws_subnet" "private" {
   }
 }
 
+################################################################
+# Create Private Route Table                                   #
+################################################################
 
-# create private route table
 resource "aws_route_table" "privateRouteTable" {
   vpc_id = aws_vpc.vpc.id
   tags = {
@@ -84,7 +102,10 @@ resource "aws_route_table" "privateRouteTable" {
   }
 }
 
-# associate private subnet route to private route table
+################################################################
+# Associate Private Subnet Route                               #
+################################################################
+
 resource "aws_route_table_association" "privateSubnetRoute" {
   count          = length(aws_subnet.private)
   subnet_id      = aws_subnet.private[count.index].id
@@ -93,8 +114,15 @@ resource "aws_route_table_association" "privateSubnetRoute" {
 
 
 
-# create nat-gateway
+################################################################
+# Create Elastic IP for Natgateway                             #
+################################################################
+
 # resource "aws_eip" "elasticIP" {}
+
+################################################################
+# Create  Natgateway                                           #
+################################################################
 
 # resource "aws_nat_gateway" "natGateway" {
 #   allocation_id = aws_eip.elasticIP.id
@@ -104,7 +132,10 @@ resource "aws_route_table_association" "privateSubnetRoute" {
 #   }
 # }
 
-# ## ensure route
+################################################################
+# Create  Natgateway Route in Private Route Table              #
+################################################################
+
 # resource "aws_route" "natGatewayRoute" {
 #   route_table_id         = aws_route_table.privateRouteTable.id
 #   nat_gateway_id         = aws_nat_gateway.natGateway.id

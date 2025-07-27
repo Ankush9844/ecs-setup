@@ -46,7 +46,7 @@ resource "aws_ecs_task_definition" "fargateTaskDefinationFrontend" {
 
   container_definitions = jsonencode([
     {
-      name      = "chatapp"
+      name      = "chatapp-frontend"
       image     = var.containerImage
       environment = [
         {
@@ -71,7 +71,7 @@ resource "aws_ecs_task_definition" "fargateTaskDefinationFrontend" {
 ################################################################
 
 resource "aws_ecs_service" "fargateServiceFrontend" {
-  name            = "fargateService"
+  name            = "fargateServiceFrontend"
   cluster         = aws_ecs_cluster.main.id
   task_definition = aws_ecs_task_definition.fargateTaskDefinationFrontend.arn
   launch_type     = "FARGATE"
@@ -84,12 +84,12 @@ resource "aws_ecs_service" "fargateServiceFrontend" {
   }
 
   load_balancer {
-    target_group_arn = var.fargateTargetGroupARN
-    container_name   = "chatapp"
+    target_group_arn = var.fargateTargetGroupFrontendARN
+    container_name   = "chatapp-frontend"
     container_port   = 3000
   }
 
-  depends_on = [aws_ecs_task_definition.fargateTaskDefination]
+  depends_on = [aws_ecs_task_definition.fargateTaskDefinationFrontend]
 }
 
 

@@ -8,10 +8,10 @@ InstanceType                = "t3.medium"
 KeyName                     = "new-server"
 aws_region                  = "us-east-1"
 account_id                  = "600748199510"
-defaultSSLCertificateARN    = "arn:aws:acm:us-east-1:600748199510:certificate/913013be-9dbb-423a-8292-6e1403192095"
-additionalSSLCertificateARN = "arn:aws:acm:us-east-1:600748199510:certificate/a16e5217-071a-4244-9bde-25868fd647ee"
+defaultSSLCertificateARN    = "arn:aws:acm:us-east-1:600748199510:certificate/6ab6b9da-4bd0-48f8-bab4-d39a1a30a2e0"
 frontendDomain              = "frontend.anshtechnolabs.shop"
 backendDomain               = "backend.anshtechnolabs.shop"
+githubConnection            = "ankush-github-connection"
 # github_token   = ""github
 #  _pat_11BBQUHAI
 #  0Rgigm9bjOwVD_iwjJbOB004CmJp0swBayf6E

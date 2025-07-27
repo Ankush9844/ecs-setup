@@ -112,7 +112,7 @@ resource "aws_codebuild_project" "codeBuildFrontendProject" {
       resource = data.aws_codestarconnections_connection.github.arn
     }
   }
-  source_version = "master"  
+  source_version = "frontend"  
 }
 
 ################################################################
@@ -120,7 +120,7 @@ resource "aws_codebuild_project" "codeBuildFrontendProject" {
 ################################################################
 
 resource "aws_codebuild_project" "codeBuildBackendProject" {
-  name          = "backend-build"
+  name          = "Backend-build"
   description   = "Builds project from GitHub"
   build_timeout = 5
   service_role  = aws_iam_role.codebuildIAMRole.arn
@@ -147,5 +147,5 @@ resource "aws_codebuild_project" "codeBuildBackendProject" {
     }
   }
 
-  source_version = "master"
+  source_version = "backend"
 }

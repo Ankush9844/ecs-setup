@@ -17,22 +17,22 @@ module "appLoadBalancer" {
   PublicSubnetIDs                = module.vpc.PublicSubnetIDs
   appLoadBalancerSecurityGroupID = module.securityGroups.appLoadBalancerSecurityGroupID
   defaultSSLCertificateARN       = var.defaultSSLCertificateARN
-  additionalSSLCertificateARN = var.additionalSSLCertificateARN
-  frontendDomain = var.frontendDomain
-  backendDomain = var.backendDomain
+  frontendDomain                 = var.frontendDomain
+  backendDomain                  = var.backendDomain
 }
 
 module "ecsOnFargate" {
-  source                           = "../modules/ecs-fargate"
-  ProjectName                      = var.ProjectName
-  ecsFargateSecurityGroupID        = module.securityGroups.ecsFagateSecurityGroupID
-  ecsFargateSecurityGroupBackendID = module.securityGroups.ecsFargateSecurityGroupBackendID
-  fargateTargetGroupARN            = module.appLoadBalancer.fargateTargetGroupARN
-  fargateTargetGroupBackendARN     = module.appLoadBalancer.fargateTargetGroupBackendARN
-  PublicSubnetIDs                  = module.vpc.PublicSubnetIDs
-  containerImage                   = var.containerImage
-  containerImageBackend            = var.containerImageBackend
-  depends_on                       = [module.vpc, module.appLoadBalancer]
+  source                            = "../modules/ecs-fargate"
+  ProjectName                       = var.ProjectName
+  ecsFargateSecurityGroupFrontendID = module.securityGroups.ecsFagateSecurityGroupFrontendID
+  ecsFargateSecurityGroupBackendID  = module.securityGroups.ecsFargateSecurityGroupBackendID
+  fargateTargetGroupFrontendARN     = module.appLoadBalancer.fargateTargetGroupFrontendARN
+  fargateTargetGroupBackendARN      = module.appLoadBalancer.fargateTargetGroupBackendARN
+  PublicSubnetIDs                   = module.vpc.PublicSubnetIDs
+  containerImage                    = var.containerImage
+  containerImageBackend             = var.containerImageBackend
+  backendDomain                     = var.backendDomain
+  depends_on                        = [module.vpc, module.appLoadBalancer]
 }
 
 # module "ecsOnEC2" {
@@ -48,14 +48,22 @@ module "ecsOnFargate" {
 # }
 
 module "codeBuildProject" {
-  source       = "../modules/pipeline/codebuild"
-  github_token = var.github_token
-  account_id   = var.account_id
-  aws_region   = var.aws_region
+  source           = "../modules/pipeline/codebuild"
+  github_token     = var.github_token
+  account_id       = var.account_id
+  aws_region       = var.aws_region
+  githubConnection = var.githubConnection
 }
 
-module "chatappFrontendPipeline" {
-  source     = "../modules/pipeline/codepipeline"
-  aws_region = var.aws_region
-  account_id = var.account_id
+module "chatappPipeline" {
+  source                   = "../modules/pipeline/codepipeline"
+  aws_region               = var.aws_region
+  account_id               = var.account_id
+  ecsClusterName           = module.ecsOnFargate.ecsClusterName
+  ecsFrontendServiceName   = module.ecsOnFargate.ecsFrontendServiceName
+  ecsBackendServiceName    = module.ecsOnFargate.ecsBackendServiceName
+  githubConnection         = var.githubConnection
+  codeBuildFrontendProject = module.codeBuildProject.codeBuildFrontendProject
+  codeBuildBackendProject  = module.codeBuildProject.codeBuildBackendProject
+  depends_on               = [module.codeBuildProject]
 }

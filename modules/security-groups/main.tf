@@ -1,3 +1,7 @@
+################################################################
+# Create Security Group for ALB                                #
+################################################################
+
 resource "aws_security_group" "appLoadBalancerSecurityGroup" {
   name        = "${var.ProjectName}-ALB-SG"
   description = "Allow HTTP"
@@ -24,6 +28,9 @@ resource "aws_security_group" "appLoadBalancerSecurityGroup" {
   }
 }
 
+################################################################
+# Create Security Group for Frontend Container                 #
+################################################################
 
 resource "aws_security_group" "ecsFargateSecurityGroupFrontend" {
   name   = "${var.ProjectName}-ECS-Tasks"
@@ -45,6 +52,9 @@ resource "aws_security_group" "ecsFargateSecurityGroupFrontend" {
   }
 }
 
+################################################################
+# Create Security Group for Backend Container                  #
+################################################################
 
 resource "aws_security_group" "ecsFargateSecurityGroupBackend" {
   name   = "${var.ProjectName}-ECS-Tasks-Backend"
@@ -66,6 +76,10 @@ resource "aws_security_group" "ecsFargateSecurityGroupBackend" {
   }
 }
 
+
+################################################################
+# Create Security Group for Containers on EC2                  #
+################################################################
 
 resource "aws_security_group" "ecsEC2SecurityGroup" {
   name        = "${var.ProjectName}-ECS-SG"
@@ -93,6 +107,13 @@ resource "aws_security_group" "ecsEC2SecurityGroup" {
   ingress {
     from_port       = 3000
     to_port         = 3000
+    protocol        = "tcp"
+    security_groups = [aws_security_group.appLoadBalancerSecurityGroup.id]
+    description     = "Allow Traffic from Application Load Balancer"
+  }
+  ingress {
+    from_port       = 5000
+    to_port         = 5000
     protocol        = "tcp"
     security_groups = [aws_security_group.appLoadBalancerSecurityGroup.id]
     description     = "Allow Traffic from Application Load Balancer"

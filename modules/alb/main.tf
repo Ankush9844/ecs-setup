@@ -29,7 +29,7 @@ resource "aws_lb_target_group" "fargateTargetGroupFrontend" {
     timeout             = 5
     healthy_threshold   = 5
     unhealthy_threshold = 2
-    matcher             = "200-302"
+    matcher             = "200"
   }
 }
 
@@ -42,7 +42,7 @@ resource "aws_lb_listener" "fargateHttpListener" {
   port              = 80
   protocol          = "HTTP"
   default_action {
-    type             = "redirect"    #forward
+    type = "redirect" #forward
     # target_group_arn = aws_lb_target_group.fargateTargetGroup.arn
 
     redirect {
@@ -67,16 +67,16 @@ resource "aws_lb_listener" "fargateHttpsListener" {
 
 
   default_action {
-    type             = "forward"
-    target_group_arn = aws_lb_target_group.fargateTargetGroupFrontend.arn
+    type = "fixed-response"   # 
+    fixed_response {
+      content_type = "text/plain"
+      message_body = "Fixed response content"
+      status_code  = "200"
+    }
   }
-  
+
 }
 
-resource "aws_lb_listener_certificate" "additional_cert" {
-  listener_arn    = aws_lb_listener.fargateHttpsListener.arn
-  certificate_arn = var.additionalSSLCertificateARN
-}
 
 ################################################################
 # Create Target Goup For Backend                               #
@@ -96,7 +96,7 @@ resource "aws_lb_target_group" "fargateTargetGroupBackend" {
     timeout             = 5
     healthy_threshold   = 5
     unhealthy_threshold = 2
-    matcher             = "200-499"
+    matcher             = "200"
   }
 }
 

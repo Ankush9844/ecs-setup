@@ -2,7 +2,7 @@ output "appLoadBalancerSecurityGroupID" {
   value = aws_security_group.appLoadBalancerSecurityGroup.id
 }
 
-output "ecsFagateSecurityGroupID" {
+output "ecsFagateSecurityGroupFrontendID" {
   value = aws_security_group.ecsFargateSecurityGroupFrontend.id
 }
 
